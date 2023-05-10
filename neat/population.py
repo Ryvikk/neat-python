@@ -54,6 +54,9 @@ class Population(object):
     def remove_reporter(self, reporter):
         self.reporters.remove(reporter)
 
+    def load_reporters(self, reporter_set):
+        self.reporters = reporter_set
+
     def run(self, fitness_function, n=None):
         """
         Runs NEAT's genetic algorithm for at most n generations.  If n
@@ -127,7 +130,7 @@ class Population(object):
             # Divide the new population into species.
             self.species.speciate(self.config, self.population, self.generation)
 
-            self.reporters.end_generation(self.config, self.population, self.species)
+            self.reporters.end_generation(self.config, self.population, self.species, self.reporters)
 
             self.generation += 1
 

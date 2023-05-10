@@ -52,23 +52,25 @@ class Checkpointer(BaseReporter):
                 checkpoint_due = True
 
         if checkpoint_due:
-            self.save_checkpoint(config, population, species_set, self.current_generation)
+            self.save_checkpoint(config, population, species_set, self.current_generation, reporters)
             self.last_generation_checkpoint = self.current_generation
             self.last_time_checkpoint = time.time()
 
-    def save_checkpoint(self, config, population, species_set, generation):
+    def save_checkpoint(self, config, population, species_set, generation, reporters):
         """ Save the current simulation state. """
         filename = '{0}{1}'.format(self.filename_prefix, generation)
         print("Saving checkpoint to {0}".format(filename))
 
         with gzip.open(filename, 'w', compresslevel=5) as f:
-            data = (generation, config, population, species_set, random.getstate())
+            data = (generation, config, population, species_set, random.getstate(), reporters)
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
-    def restore_checkpoint(filename):
+    def restore_checkpoint(filename, load_reporters=False):
         """Resumes the simulation from a previous saved point."""
         with gzip.open(filename) as f:
-            generation, config, population, species_set, rndstate = pickle.load(f)
+            generation, config, population, species_set, rndstate, reporters = pickle.load(f)
             random.setstate(rndstate)
-            return Population(config, (population, species_set, generation))
+            p = Population(config, (population, species_set, generation))
+            if load_reporters: pop.load_reporters(reporters)
+            return p
