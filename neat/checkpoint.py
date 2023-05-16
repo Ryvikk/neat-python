@@ -38,7 +38,7 @@ class Checkpointer(BaseReporter):
     def start_generation(self, generation):
         self.current_generation = generation
 
-    def end_generation(self, config, population, species_set):
+    def end_generation(self, config, population, species_set, reporters):
         checkpoint_due = False
 
         if self.time_interval_seconds is not None:
@@ -72,5 +72,5 @@ class Checkpointer(BaseReporter):
             generation, config, population, species_set, rndstate, reporters = pickle.load(f)
             random.setstate(rndstate)
             p = Population(config, (population, species_set, generation))
-            if load_reporters: pop.load_reporters(reporters)
+            if load_reporters: p.load_reporters(reporters)
             return p
